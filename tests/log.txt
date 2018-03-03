@@ -1,0 +1,58 @@
+============================= test session starts =============================
+platform win32 -- Python 3.6.3, pytest-3.3.0, py-1.5.2, pluggy-0.6.0 -- D:\Software\Anaconda27\envs\py36\python.exe
+cachedir: .cache
+rootdir: D:\Dropbox\Research\Software\python\PacsTools\tests, inifile:
+plugins: hypothesis-3.38.5
+collecting ... collected 11 items
+
+pacstools_path_test.py::TestAccessionPathWalk::test_pacstools_storage_path_auto_gen_no_input SKIPPED [  9%]
+pacstools_path_test.py::TestAccessionPathWalk::test_pacstools_storage_path_auto_gen_bad_input SKIPPED [ 18%]
+pacstools_path_test.py::TestAccessionPathWalk::test_no_folders_directory_failure FAILED [ 27%]
+pacstools_path_test.py::TestAccessionPathWalk::test_unc_path_multi_scanner_multi_accession SKIPPED [ 36%]
+pacstools_path_test.py::TestAccessionPathWalk::test_no_scanner_no_accession_list PASSED [ 45%]
+pacstools_path_test.py::TestAccessionPathWalk::test_single_scanner_no_accession_list PASSED [ 54%]
+pacstools_path_test.py::TestAccessionPathWalk::test_single_scanner_single_accession_list PASSED [ 63%]
+pacstools_path_test.py::TestAccessionPathWalk::test_single_scanner_multi_accession_list PASSED [ 72%]
+pacstools_path_test.py::TestAccessionPathWalk::test_multi_scanner_no_accession_list PASSED [ 81%]
+pacstools_path_test.py::TestAccessionPathWalk::test_multi_scanner_single_accession_list PASSED [ 90%]
+pacstools_path_test.py::TestAccessionPathWalk::test_multi_scanner_multi_accession_list PASSED [100%]
+
+================================== FAILURES ===================================
+___________ TestAccessionPathWalk.test_no_folders_directory_failure ___________
+
+self = <pacstools_path_test.TestAccessionPathWalk object at 0x000001D2B0D23F60>
+tmpdir = local('C:\\Users\\Ryan\\AppData\\Local\\Temp\\pytest-of-Ryan\\pytest-0\\test_no_folders_directory_fail0')
+
+    def test_no_folders_directory_failure(self, tmpdir):
+        """This test generates a directory - "folder" - instead of "folders"
+               to ensure that the SectraListener initialization will raise an
+               error - NotADirectoryError"""
+    
+        # Generate a directory that should cause a failure
+        dirFolder = tmpdir.mkdir('folder')
+    
+        with pytest.raises(NotADirectoryError):
+>           pacstools.SectraListener(dirFolder)
+
+pacstools_path_test.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <pacstools.SectraListener object at 0x000001D2B0D39588>
+dirsSectra = local('C:\\Users\\Ryan\\AppData\\Local\\Temp\\pytest-of-Ryan\\pytest-0\\test_no_folders_directory_fail0\\folder')
+dirDataBase = None
+
+    def __init__(self, dirsSectra, dirDataBase=None):
+    
+        #TODO: is there any additional validation that needs to be performed?
+        #      Currently, the user's input is checked to ensure a string or
+        #      list of strings is passed (the latter not exactly). Also, the
+        #      strings are joined with a "folders" directory to ensure that the
+        #      appropriate sub-directory exists.
+        self.listDirSectra = []  # initialize
+        if (type(dirsSectra) == str):
+            dirsSectra = [dirsSectra]
+>       assert(type(dirsSectra) == list)
+E       AssertionError
+
+..\pacstools.py:512: AssertionError
+================ 1 failed, 7 passed, 3 skipped in 7.76 seconds ================

@@ -1,0 +1,4 @@
+{
+  "pacstools_path_test.py::TestAccessionPathWalk": true,
+  "pacstools_path_test.py::TestAccessionPathWalk::()::test_no_folders_directory_failure": true
+}
