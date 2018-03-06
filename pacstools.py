@@ -92,6 +92,10 @@ class PacsToolsMixin(object):
         if not self._readonly:
 
             # Initialize the data frame if non-existent
+            #FIXME: By initializing all columns in the data frame to None, a
+            #       row of None values is created and stored as teh first entry
+            #       in the data file. Currently, the SectraListener class can
+            #       remove this row, but not the Modality class
             if self._hdfKey not in self._hdf.root:
                 df = self._dataMap
                 df.loc[0, :] = None
@@ -279,6 +283,10 @@ class PacsToolsMixin(object):
         typeMap = self._dataTypeMap
         for c in data.columns:
             if check_category and (typeMap[c] == 'category'):
+                # For categorical data, remove any NaN. Replace those values
+                # with an empty string
+                data[c] = data[c].replace(float('NaN'), '')
+
                 # Load a single entry from the database and attempt to define
                 # the categories based on the file's content. If the categories
                 # are not the same (i.e., the sets are not equal), create a
@@ -289,6 +297,10 @@ class PacsToolsMixin(object):
                     if cat not in df[c].cat.categories:
                         df[c] = df[c].cat.add_categories(cat)
                 data[c] = data[c].astype(df[c].dtype)
+            elif (typeMap[c] == float):
+                # If type casting is attempted from an empty string to a float,
+                # an error will occur. Instead replace empty strings with NaN
+                data[c] = data[c].replace(r'\s', float('NaN'), regex=True)
             else:
                 data[c] = data[c].astype(typeMap[c])
 
@@ -590,15 +602,15 @@ class PacsImportModality(PacsToolsMixin):
                         fl1 = dicomtools.vendormaps.FilterThicknessMinimum(hdr)
                         fl2 = dicomtools.vendormaps.FilterThicknessMaximum(hdr)
                         if val:
-                            for flIdx, val in enumerate(val):
-                                dfData.loc[0, 'FilterMaterial'] = val
-                                if (val.lower() in ['copper', 'none']):
+                            for flIdx, el in enumerate(val):
+                                dfData.loc[0, 'FilterMaterial'] = el
+                                if (el.lower() in ['copper', 'none']):
                                     dfData.loc[0, 'CuFilterMin'] = fl1[flIdx]
                                     dfData.loc[0, 'CuFilterMax'] = fl2[flIdx]
-                                elif (val.lower() == 'aluminum'):
+                                elif (el.lower() == 'aluminum'):
                                     dfData.loc[0, 'AlFilterMin'] = fl1[flIdx]
                                     dfData.loc[0, 'AlFilterMax'] = fl2[flIdx]
-                                elif (val.lower() == 'unknown'):
+                                elif (el.lower() == 'unknown'):
                                     pass
                                 else:
                                     raise NotImplementedError()
@@ -609,14 +621,6 @@ class PacsImportModality(PacsToolsMixin):
                     elif (k == 'ImageProcessingDescription'):
                         dfData.at[0, k] = \
                           dicomtools.vendormaps.ImageProcessingDescription(hdr)
-
-                    #TODO: if type casting is attempted from string to
-                    #      float and the value is a null string, an error
-                    #      will occur. I need to see if there is a way to
-                    #      handle the following if statement elsewhere
-                    if (dfData.at[0, k] != 0) and not dfData.at[0, k] and (
-                            dcmDict[k][0] == float):
-                        dfData.at[0, k] = float('NaN')
 
                 # Body part
                 #TODO: there should be a check for the tag (0x008, 0x2218).
