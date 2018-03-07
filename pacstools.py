@@ -300,7 +300,7 @@ class PacsToolsMixin(object):
             elif (typeMap[c] == float):
                 # If type casting is attempted from an empty string to a float,
                 # an error will occur. Instead replace empty strings with NaN
-                data[c] = data[c].replace(r'\s', float('NaN'), regex=True)
+                data[c] = data[c].replace('', float('NaN'))
             else:
                 data[c] = data[c].astype(typeMap[c])
 
