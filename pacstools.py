@@ -300,6 +300,12 @@ class PacsToolsMixin(object):
             elif (typeMap[c] == float):
                 # If type casting is attempted from an empty string to a float,
                 # an error will occur. Instead replace empty strings with NaN
+                #TODO: there seems to be an issue that is introduced with float
+                #      columns. For example, when the modality DB SeriesNumber
+                #      column was casted as float, a pytables ValueError was
+                #      thrown. See the ValueError in set_atom_string (line:
+                #      1954). I need to figure out why this is happening. As a
+                #      quick fix, I've simply type casted that column as INT
                 data[c] = data[c].replace('', float('NaN'))
             else:
                 data[c] = data[c].astype(typeMap[c])
@@ -326,10 +332,11 @@ class PacsToolsMixin(object):
 
         """
 
-        # Combine the stored and in-memory data frames
+        # Combine the stored and in-memory data frames and reset the index
         if partial and (self._hdfKey in self._hdf.root):
             data = self._hdf.get(self._hdfKey).append(data)
         data = self._map_data_types(data, check_category=False)
+        data = data.reset_index(drop=True)
 
         self._hdf.close()
 
@@ -444,7 +451,7 @@ class PacsImportModality(PacsToolsMixin):
                     'SeriesDate': [str, (0x0008, 0x0020)],
                     'Protocol': [str, (0x0011, 0x1046)],
                     'StudyDescription': [str, (0x0008, 0x1030)],
-                    'SeriesNumber': [float, (0x0020, 0x0011)],
+                    'SeriesNumber': [int, (0x0020, 0x0011)],
                     'SeriesDescription': [str, (0x008, 0x103e)],
                     'BodyPart': [str, (0x0018, 0x0015)],
                     'Exposure': [float, (0x0018, 0x1153)],
@@ -621,13 +628,6 @@ class PacsImportModality(PacsToolsMixin):
                     elif (k == 'ImageProcessingDescription'):
                         dfData.at[0, k] = \
                           dicomtools.vendormaps.ImageProcessingDescription(hdr)
-
-                # Body part
-                #TODO: there should be a check for the tag (0x008, 0x2218).
-                #      When that tag exists, more detailed information can
-                #      be gathered
-    #                        if dfIsNullEntry.BodyPart:
-    #                            dfData.BodyPart = hdr[0x0018, 0x0015].value
 
                 # Pixel spacing
                 #TODO: I think i moved this to the equipment database
