@@ -297,17 +297,9 @@ class PacsToolsMixin(object):
                     if cat not in df[c].cat.categories:
                         df[c] = df[c].cat.add_categories(cat)
                 data[c] = data[c].astype(df[c].dtype)
-            elif (typeMap[c] == float):
-                # If type casting is attempted from an empty string to a float,
-                # an error will occur. Instead replace empty strings with NaN
-                #TODO: there seems to be an issue that is introduced with float
-                #      columns. For example, when the modality DB SeriesNumber
-                #      column was casted as float, a pytables ValueError was
-                #      thrown. See the ValueError in set_atom_string (line:
-                #      1954). I need to figure out why this is happening. As a
-                #      quick fix, I've simply type casted that column as INT
-                data[c] = data[c].replace('', float('NaN'))
             else:
+                if (typeMap[c] == float):
+                    data[c] = data[c].replace('', float('NaN'))
                 data[c] = data[c].astype(typeMap[c])
 
         return data
