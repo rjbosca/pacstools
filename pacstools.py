@@ -49,7 +49,7 @@ class PacsToolsMixin(object):
         When setting this property, a str or py.path.local can be provided.
         All str values are converted to py.path.local objects. Moreover, the
         provided file name is checked to ensure the user has appropriate
-        privlages
+        privileges
 
         """
         return self.___fileDataBase
@@ -93,7 +93,7 @@ class PacsToolsMixin(object):
 
             # Initialize the data frame if non-existent
             #FIXME: By initializing all columns in the data frame to None, a
-            #       row of None values is created and stored as teh first entry
+            #       row of None values is created and stored as the first entry
             #       in the data file. Currently, the SectraListener class can
             #       remove this row, but not the Modality class
             if self._hdfKey not in self._hdf.root:
@@ -135,7 +135,7 @@ class PacsToolsMixin(object):
         Returns
         -------
         success : bool
-            True when the copy occurs succesfully
+            True when the copy occurs successfully
 
         """
 
@@ -210,8 +210,8 @@ class PacsToolsMixin(object):
             assert(type(accession) == str)
 
             # This will append the accession number to the current directory.
-            #  In the event that the accession number cannont be found, a non-
-            # existant path should be returned
+            #  In the event that the accession number cannot be found, a non-
+            # existent path should be returned
             val = py.path.local(accession)
 
             # Find the exam index
@@ -359,13 +359,13 @@ class PacsImportModality(PacsToolsMixin):
     readOnly : bool
         (Optional) When True, instantiates the class in read-only mode (i.e.,
         no database writing is allowed). This is useful when using the modality
-        sepcific database with other software
+        specific database with other software
 
     """
 
     def __init__(self, modality, fileServerMap, **kwargs):
 
-        # Update the moadlity first as this might be used by other set methods
+        # Update the modality first as this might be used by other set methods
         self._modality = modality
         self._readonly = kwargs.get('readOnly', False)
         self._isbackup = kwargs.get('createBackUp', True)
@@ -514,7 +514,7 @@ class PacsImportModality(PacsToolsMixin):
         """
 
         # Parse the user input
-        #TODO: i need to check the checkhas and hash logic
+        #TODO: i need to check the checkhash and hash logic
         chunksize = kwargs.get('chunksize', 100)
         isCheckHash = kwargs.get('checkhash', True)
         isHash = kwargs.get('hash', False)
@@ -606,7 +606,7 @@ class PacsImportModality(PacsToolsMixin):
                                 if (el.lower() in ['copper', 'none']):
                                     dfData.loc[0, 'CuFilterMin'] = fl1[flIdx]
                                     dfData.loc[0, 'CuFilterMax'] = fl2[flIdx]
-                                elif (el.lower() == 'aluminum'):
+                                elif (el.lower() in ['aluminum', 'aluminium']):
                                     dfData.loc[0, 'AlFilterMin'] = fl1[flIdx]
                                     dfData.loc[0, 'AlFilterMax'] = fl2[flIdx]
                                 elif (el.lower() == 'unknown'):
