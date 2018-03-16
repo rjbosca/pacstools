@@ -408,7 +408,7 @@ class PacsImportModality(PacsToolsMixin):
 
     @property
     def _dataCols(self):
-        return ['File', 'MD5']
+        return ['Accession', 'File', 'MD5']
 
     @property
     def _dataTypeMap(self):
