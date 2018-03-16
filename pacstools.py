@@ -507,17 +507,12 @@ class PacsImportModality(PacsToolsMixin):
             Accession numbers to add to the database (if not already added).
         chunksize : int
             Number of database entries to add before writing to the HDF file
-        checkhash : bool
-            When True, hashes are calculated for duplicate files existing in
-            the database. DICOM data is added to the database if needed
 
         """
 
         # Parse the user input
-        #TODO: i need to check the checkhash and hash logic
         chunksize = kwargs.get('chunksize', 100)
-        isCheckHash = kwargs.get('checkhash', True)
-        isHash = kwargs.get('hash', False)
+        isHash = kwargs.get('hash', False)  # undocumented functionality
         if kwargs.get('accessions', None):
             sl = self._dataServerMap.Accession.isin(kwargs.get('accessions'))
         else:
@@ -655,9 +650,9 @@ class PacsImportModality(PacsToolsMixin):
                     # Reset the data variable
                     data = self._dataMap
 
-        if nAcc and isCheckHash and sl.any():
-            self.process(self._dataServerMap.loc[sl, 'Accession'],
-                         hash=True, checkhash=False)
+        if nAcc and sl.any() and not hash:
+            acc = self._dataServerMap.loc[sl, 'Accession'].tolist()
+            self.process(accessions=acc, hash=True, checkhash=False)
 
 
 class SectraPacs(PacsToolsMixin):
